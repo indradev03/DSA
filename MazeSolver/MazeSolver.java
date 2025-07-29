@@ -3,6 +3,7 @@ package MazeSolver;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.Queue;
 
 public class MazeSolver {
     private final int[][] maze;
@@ -104,28 +105,54 @@ public class MazeSolver {
         return path;
     }
 
-    public void draw(Graphics g, int size) {
-        // Draw maze grid
-        for (int i = 0; i < maze.length; i++) {
-            for (int j = 0; j < maze[i].length; j++) {
-                Color color = (maze[i][j] == 1) ? Color.BLACK : Color.WHITE;
-                g.setColor(color);
-                g.fillRect(j * size, i * size, size, size);
-                g.setColor(Color.GRAY);
-                g.drawRect(j * size, i * size, size, size);
+        public void draw(Graphics g, int size) {
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            // Draw maze grid
+            for (int i = 0; i < maze.length; i++) {
+                for (int j = 0; j < maze[i].length; j++) {
+                    if (maze[i][j] == 1) {
+                        g2.setColor(new Color(40, 40, 40)); // dark gray walls
+                    } else {
+                        g2.setColor(new Color(230, 230, 230)); // light path
+                    }
+                    g2.fillRect(j * size, i * size, size, size);
+                }
             }
+
+            // Optional: Draw visited cells (light blue overlay)
+            g2.setColor(new Color(150, 200, 255, 100));
+            for (int i = 0; i < visited.length; i++) {
+                for (int j = 0; j < visited[i].length; j++) {
+                    if (visited[i][j]) {
+                        g2.fillRect(j * size, i * size, size, size);
+                    }
+                }
+            }
+
+            // Draw path (cyan with rounded effect)
+            g2.setColor(new Color(0, 255, 255, 180));
+            for (Point p : path) {
+                g2.fillRoundRect(p.y * size + size / 4, p.x * size + size / 4, size / 2, size / 2, 10, 10);
+            }
+
+            // Draw grid lines (optional)
+            g2.setColor(new Color(180, 180, 180));
+            for (int i = 0; i < maze.length; i++) {
+                for (int j = 0; j < maze[i].length; j++) {
+                    g2.drawRect(j * size, i * size, size, size);
+                }
+            }
+
+            // Draw start (green) and end (red)
+            g2.setColor(new Color(0, 200, 0)); // green
+            g2.fillOval(start.y * size + size / 4, start.x * size + size / 4, size / 2, size / 2);
+
+            g2.setColor(new Color(220, 30, 30)); // red
+            g2.fillOval(end.y * size + size / 4, end.x * size + size / 4, size / 2, size / 2);
         }
 
-        // Draw start (green) and end (red)
-        g.setColor(Color.GREEN);
-        g.fillRect(start.y * size, start.x * size, size, size);
-        g.setColor(Color.RED);
-        g.fillRect(end.y * size, end.x * size, size, size);
-
-        // Draw path (cyan)
-        g.setColor(Color.CYAN);
-        for (Point p : path) {
-            g.fillRect(p.y * size + size / 4, p.x * size + size / 4, size / 2, size / 2);
-        }
     }
-}
+    
+
